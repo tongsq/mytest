@@ -34,6 +34,7 @@ router.post('/signin', async (ctx, next)=>{
 });
 const controller = require('./controller');
 app.use(bodyParser());
+const number = 100;
 //app.use(router.routes());
 app.use(controller());
 app.listen(8080);

@@ -4,7 +4,7 @@ var fn_index = async (ctx, next)=>{
         <p>Name: <input name="name" value="koa"/></p>
         <p>Passwd: <input name="passwd" type="password" value="123456"></p>
         <p><input type="submit" value="submit"></p>
-        </form>`;
+	</form>`;
 };
 
 var fn_signin = async (ctx, next)=>{
