@@ -1,2 +1,6 @@
 docker run -d --rm -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=my_test_1 hub.c.163.com/library/mysql -d 3333:3306
+echo -e "OK! \c" 
+cluster meet
+cluster addslots
+expr index hello o
 

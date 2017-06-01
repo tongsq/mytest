@@ -12,6 +12,7 @@ var server = http.createServer((request, response)=>{
     fs.stat(filepath, (err, stats)=>{
 	if (!err && stats.isFile()){
 	    console.log('200' + request.url);
+	    console.log(request.connection.remoteAddress);
 	    response.writeHead(`200`, {'Content-Type': 'text/html;charset=UTF-8'});
 	    let fstream = fs.createReadStream(filepath).pipe(response);
 	}else{

@@ -7,12 +7,12 @@ const wss = new WebSocketServer({
 wss.on('connection', function(ws){
     console.log(`[SERVER] connection()`);
     ws.on('message', function(message){
-	console.log(`[SERVER] Received: ${message}`);
-	ws.send(`server accept ${message}`, (err)=>{
-	    if (err){
-		console.log(`[SERVER] error: ${err}`);
-	    }
-	})
+		console.log(`[SERVER] Received: ${message}`);
+		ws.send(`server accept ${message}`, (err)=>{
+	    	if (err){
+			console.log(`[SERVER] error: ${err}`);
+	    	}
+		})
     });
     var interval = setInterval(()=>{
 	ws.send('this is a message send from server' + new Date().getTime(), (err)=>{

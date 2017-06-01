@@ -8,7 +8,8 @@ const app = new Koa();
 //    ctx.response.body = '<h1>Hello, koa2!</h1>';
 //});
 app.use(async(ctx, next) => {
-    console.log(`${ctx.request.method} ${ctx.request.url}`); // 打印URL
+    console.log(ctx.request)
+    console.log(`${ctx.request.ip} ${ctx.request.method} ${ctx.request.url}`); // 打印URL
     await next(); // 调用下一个middleware
 });
 
