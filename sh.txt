@@ -3,4 +3,4 @@ echo -e "OK! \c"
 cluster meet
 cluster addslots
 expr index hello o
-
+curl -sS https://getcomposer.org/installer | php

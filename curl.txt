@@ -1,0 +1,2 @@
+query_tel : curl "http://172.20.230.52:81/mkr?reqtype=query_tel&ascode=BuuZawjMfIfgKVwan6Emtlf4aIwunn5AZc2bmT7JNrhxapR4adsO3%5C%2F8kw3%2Bn2JciWo6y9tLPYdymnNHczEf%2B4j9Qfkxqjl8YTLH%2BaipuaADGCVBzv1Ipk6Gm8WC1S%2BKPnkoPlUjy2EGGMulNI5SRd0JbGFl2%2B%5C%2FTKr7HkgiMcVjs%3D&rsa_version=default_7"
+
