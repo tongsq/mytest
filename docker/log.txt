@@ -3,6 +3,9 @@ docker run -d -p 80:80 --name webserver nginx
 docker run -d -it --rm --name centostest --mount type=bind,source=/home/tongsiqi/docker,destination=/data/docker centos:latest
 docker diff centostest
 docker commit --author "tongsq" --message "test commit" centostest centos:vtest
+docker rmi $(docker images -q -f dangling=true) 
+docker rm $(docker ps -a -q)
+FROM debian:jessie-slim
 
 #!/bin/sh
 ...
