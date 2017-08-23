@@ -1,0 +1,1 @@
+namei -om `pwd`
