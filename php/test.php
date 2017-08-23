@@ -1,5 +1,7 @@
 <?php
 namespace Test;
+var_dump(get_declared_classes());exit();
+var_dump(__FILE__, __LINE__);
 $o = [];
 @$var = ["",0,null,1,2,3,$foo,$o['myIndex']];
 array_walk($var, function($v) {
