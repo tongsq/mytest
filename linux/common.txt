@@ -1,0 +1,2 @@
+group add mysql
+useradd -g mysql -d /user/local/mysql -s /sbin/nologin -M mysql
