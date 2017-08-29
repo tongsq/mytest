@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>drawsvg</title>
+		<meta charset="utf-8"/>
+		<script src="d3/d3.js"></script>
+		<script type="text/javaScript">
+			function textChange(e){
+				var path = document.getElementById("path");
+				console.log(e.target);
+				var value = e.target.value;
+				path.setAttribute('d',value);
+			}
+		</script>
+		<style>
+			.container{
+				width:1000px;height:500px;
+				border:1px solid #ccc;
+				position:relative;
+				top:0px;bottom:0px;left:0px;right:0px;
+				margin:auto;
+			}
+			.control{
+				height:50px;width:980px;
+				margin:20px auto;
+				font-size:24px;
+				padding-left:20px;
+				color:#4d4848;
+			}
+		</style>
+	</head>
+	<body>
+	<div style="width:100%;height:100%;position:relative;">
+		<div class="container">
+			<svg width="100%" height="100%" version="1.1"
+			xmlns="http://www.w3.org/2000/svg">
+				<path d="" style="fill:none;stroke:red;stroke-width:2" id="path" />
+			</svg>
+		</div>
+		<div style="width:100%;text-align:center;">
+			<input type="text" class="control" oninput="textChange(event);">
+		</div>
+	</div>
+	</body>
+</html>
