@@ -1,0 +1,37 @@
+d3.select('#container')
+.append('svg:svg')
+.attr('width', 500)
+.attr('height', 250)
+
+var scale_x = d3.scale.linear()
+.domain([0,2])
+.range([0,25])
+
+line = d3.svg.line()
+.x(function(d,i){return scale_x(i)})
+.y(function(d,i){return d})
+.interpolate("cardinal")
+
+data = [5,10,23]
+
+
+d3.select('svg')
+.append('g')
+.attr('transform', 'translate(50, 30)')
+.append('path')
+.attr('d', line(data))
+
+x_axis = d3.svg.axis().scale(scale_x)
+d3.select('svg')
+.append('g')
+.call(x_axis)
+.append('text')
+.text('Price')
+.attr('transform', 'rotate(-90)')
+.attr('text-anchor', 'end')
+.attr('dy', '1em')
+
+.domain,.tick line{
+    stroke:gray;
+    stroke-width:1;
+}
