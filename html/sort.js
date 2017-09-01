@@ -1,10 +1,100 @@
-var scale_x = d3.scaleLinear().domain([0,100]).range([0,1000]);
-var scale_y = d3.scaleLinear().domain([0,100]).range([500,0]);
+class svgShower{
+	//min生成数组最小值
+	//max生成数组最大值
+	//count数组长度，点的个数
+	constructor(min, max, count)
+	{
+		this.min = min;
+		this.max = max;
+		this.range = max - min;
+		this.count = count;
+		this.point_prefix = 'point_';
+		this.swap_arr = [];
+		this.scale_x = d3.scaleLinear().domain([0, count]).range([0, 1000]);
+		this.scale_y = d3.scaleLinear().domain([this.min, this.max]).range([500, 0]);
+		this.root = d3.select('svg').append('g').attr('id', 'root');
+		this.init_xy_axis()
+		this.points = this.root.append('g').attr('id', 'points');
+	}
+	//初始化坐标轴
+	init_xy_axis()
+	{
+		var x_axis = d3.axisBottom().scale(this.scale_x).tickSize(12);
+		var y_axis = d3.axisLeft().scale(this.scale_y).ticks(10, 's').tickSize(10);
+		var root = this.root;
+		root.attr('transform', 'translate(50,50)');
+		root.append('g').call(x_axis).attr('transform', 'translate(0,500)');
+		root.append("g").call(y_axis);
+	}
+	//增加数组中的值
+	add_point(index, value)
+	{
+		this.points.append('circle')
+			.attr('cx', this.scale_x(index))
+			.attr('cy', this.scale_y(value))
+			.attr('r', 3)
+			.attr('fill', 'green')
+			.attr('id', this.point_prefix + index);
+	}
+	add_swap(index_1, index_2)
+	{
+		this.swap_arr.push({key1:index_1, key2:index_2});
+	}
+	show_swap(show_line = null)
+	{
+		if(this.swap_arr.length == 0) return;
+		var data = this.swap_arr[0];
+		var point_1 = d3.select('#'+this.point_prefix+data.key1);
+		var point_2 = d3.select('#'+this.point_prefix+data.key2);
+		var path = 'M' + point_1.attr('cx') + ',' + point_1.attr('cy') + ' L' + point_2.attr('cx') + ',' + point_2.attr('cy');
+		if (!show_line){
+			show_line = this.root.append('g').append('path').attr('stroke', 'red').attr('stroke-width', 1);
+		}
+		show_line.attr('d', path);
+		setTimeout(()=>{
+			this.swap_arr.shift();
+			var cy1 = point_1.attr('cy');
+			point_1.attr('cy', point_2.attr('cy'));
+			point_2.attr('cy', cy1);
+			show_line.attr('d', '');
+			this.show_swap(show_line);
+		}, 500);
+	}
+	init_points(arr){
+		
+	}
+	create_arr(){
+		var arr = [];
+		var length = this.count;
+		for(var i=0; i<length; i++){
+			var num = this.getRandInt();
+			arr[i] = num;
+			this.add_point(i, num);
+		}
+		return arr;
+	}
+	getRandInt(){
+		var rand = Math.random();
+		return Math.round(this.range * rand);
+	}
+}
 
-var x_axis = d3.axisBottom().scale(scale_x).tickSize(12);
-var y_axis = d3.axisLeft().scale(scale_y).ticks(10,"s").tickSize(10);
-var axis_g = d3.select("#svg").append('g');
-axis_g.attr('transform', 'translate(50,50)');
-axis_g.append("g").call(x_axis).attr('transform', 'translate(0,500)');
-axis_g.append("g").call(y_axis);
-			
+var svgShowerObj = new svgShower(0, 100, 20);
+var arr = svgShowerObj.create_arr();
+
+//
+var length = arr.length;
+for(var i=0; i<length; i++){
+	var end = length - i -1;
+	for(var j=0 ;j<end; j++){
+		if (arr[j] > arr[j+1]){
+			var tmp = arr[j];
+			arr[j] = arr[j+1];
+			arr[j+1] = tmp;
+			svgShowerObj.add_swap(j, j+1);
+		}
+	}
+}
+console.log(arr);
+svgShowerObj.show_swap();
+
