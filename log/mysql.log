@@ -1,0 +1,34 @@
+前缀索引：使用字段的部分前缀做为索引，可以有效减少索引的长度
+	1)、创建索引
+		alter table testdb.user ADD KEY(username(5)) //使用username前5个字符作为索引
+	2)、检查全列选择性
+		select count(distinct left(username, 5))/count(*) from user;
+	
+模拟哈希索引：很大的建也只有很小的索引
+	1)、新增索引列
+		alter table testdb.user add column username_crc int unsigned NOT NULL DEFAULT 0;
+		alter table user add index index_username_crc(username_crc);
+	2)、创建触发器自动更新索引列：
+		DELIMITER |
+		CREATE TRIGGER user_crc_ins BEFORE INSERT ON user FOR EACH ROW BEGIN SET NEW.username_crc=crc32(NEW.username);
+		END;
+		|
+		CREATE TRIGGER user_crc_upd BEFORE UPDATE ON user FOR EACH ROW BEGIN SET NEW.username_crc=crc32(NEW.username);
+		END;
+		|
+		DELIMITER ;
+	3)、使用索引：
+		select id from user where username_crc=crc32('tom') and username='tom';
+		
+聚集索引：InnoDB主键，数据行实际保存在B-Tree索引的叶子页，第二索引访问需要两次索引查找
+
+索引覆盖：查询的字段在索引行中时，explain extra字段有Using index
+
+查看索引： show index from user;
+
+更新索引统计：analyze table user;
+
+消除碎片：optimize table user; myisam会阻塞
+
+查询缓存：query_cache_type (ON,OFF,DEMAND) select SQL_CACHE * from ...
+	
