@@ -1,0 +1,22 @@
+samba开发环境搭建:
+1、关闭firewalld
+2、关闭selinux
+
+yum -y install samba
+systemctl start smb
+systemctl status smb
+systemctl enable smb
+配置文件: /etc/samba/smb.conf
+[global]
+		workgroup = SAMBA
+        security = user
+        hosts allow = 10.10.16.136
+[php]
+        comment = php
+        path = /home/tongsiqi/php
+        browseable = Yes
+        writable = Yes
+        write list = tongsq
+        valid users = tongsq
+
+建立用户 smbpasswd –a username 
