@@ -31,4 +31,109 @@
 消除碎片：optimize table user; myisam会阻塞
 
 查询缓存：query_cache_type (ON,OFF,DEMAND) select SQL_CACHE * from ...
+
+合并表：
+
+分区表：
+
+启动：/usr/local/mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf
+
+主从同步：
+	1）、主库开启binlog  log-bin = /data/3306/mysql-bin
+	2）、设置主从server-id  server-id=1 server-id=2、关闭selinux
+	3）、主库创建复制用户 grant replication slave,replication client on *.* to `rep`@`10.0.0.%` identified by '123456';flush privileges;
+set session binlog_format=mixed;
+	4）、锁表主库: flush table with read lock; 查看复制点：show master status; => (file:mysl-bin.0001 position 9122)
+	5）、导出主库：mysqldump -uroot -p123456 -S /data/3306/mysql.sock -A -B --events|gzip >/server/backup/rep_bak$(date +%F).sql.gz
+	6）、解锁主库：unlock table;
+	7）、数据导入从库: gzip -d rep_bak2017-06-01.sql.gz && mysql -uroot -p123456 -S /data/3307/mysql.sock <rep_bak2017-06-01.sql
+	8）、配置从库：
+			CHANGE MASTER TO 
+			MASTER_HOST='172.16.1.52',  #这是主库的IP（域名也可以需要做解析）
+			MASTER_PORT=3306,              #主库的端口，从库端口和主库不可以相同
+			MASTER_USER='rep',            #这是主库上创建用来复制的用户rep
+			MASTER_PASSWORD='123456'    #rep的密码
+			MASTER_LOG_FILE='mysql-bin.000025', #这里是show master status时看到的查询二进制日志文件名称
+			MASTER_LOG_POS=9155;       #这里是show master status时看到的二进制日志偏移量
+			start slave;
+			
+			log_slave_updates //把主库的改动传播下去
+	9）、从库状态：show slave status;
+
+	10）、使用mysqldump自动锁表并记录复制点 mysqldump --master-data=1  -uroot -p123456 -S /data/3306/mysql.sock -B -F -R -x -A --events|gzip >/server/backup/rep3307_(date +%F).sql.gz
+
+	binlog_format: MIXED ROW STATEMENT  set session binlog_format='ROW'
+	expire_logs_days
+	
+复制过滤器：
+	1）、主服务器上把事件从二进制日志中过滤掉
+		binlog_do_db
+		binlog_ignore_db
+	
+	2）、从服务器把事件从中继日志中过滤掉
+		replicate_do_db
+		replicate_do_table
+		replicate_ignore_db
+		...
+	
+32位linux系统，单个进程能使用的地址空间在2.5GB到2.7GB之间 mysql单进程多线程
+
+MyISAM键缓存：也被叫做键缓冲区，默认只有一个缓冲区，但是可以创建多个。MyISAM自身只缓存了索引，没有数据（它让操作系统缓存数据）。如果主要是使用MyISAM,
+那么就应该为键缓存分配很多内存。
+	key_buffer_1.key_buffer_size = 1G
+	key_buffer_2.key_buffer_size = 2G
+	cache index t1,t2 in key_buffer_1;//表t1,t2的索引保存到key_buffer_1
+	load index into cache t1,t2; //加载表索引到缓存中
+	
+InnoDB缓冲池：InnoDB严重依赖于缓冲池，应该给它分配足够的内存
+		innodb_buffer_pool_size = 1G
+		innodb_max_dirty_page_pct=50%
+
+线程缓存：线程缓存保存了和当前连接无关的线程，这些线程可以供新连接使用
+		thtead_cache_size
+
+表缓存：对于MyISAM而言，它保存了表的数据或索引文件描述符。对于InnoDB来说，表缓存不是那么重要，但还是可以从解析后的.frm文件中获益
+		table_definition_cache     //设的足够高以缓存所有表的定义
+		table_open_cache 打开的表
+
+MyISAM I/O调优：
+		delay_key_write:OFF ON ALL  //延迟索引的写入
+		myisam_recover：BACKUP FORCE QUICK //控制myisam查找和修复错误的方式
+		myisam_use_mmap //开启内存映射
+	
+InnoDB事务日志：InnoDB使用日志来减少提交事务的开销，它不是每次事务提交的时候就把缓存池刷写到磁盘上，而是记录了事务。使用日志把随机IO转换为顺序IO，
+		InnoDB使用后台线程只能地把日志的改变写入到数据文件中
+		日志文件总体大小：innodb_log_file_size=256MB(最大4G) innodb_log_files_in_group
+		innodb_log_buffer_size = 1~8M  //控制内存日志缓冲区大小
+		innodb_log_at_trx_commit = 1|2 //控制如何刷写日志缓冲
+		innodb_flush_method = datasync | 0_DIRECT //控制InnoDB如何打开并清写日志和数据文件，改变InnoDB如何执行IO操作会极大地影响性能，要仔细评测他们
+		
+InnoDB表空间：InnoDB把数据保存在表空间中，表空间实际上是跨越了磁盘上的一个或多个文件的虚拟文件系统。
+		innodb_data_home_dir = /var/lib/mysql/  数据存放目录
+		innodb_data_file_path = ibdata1:1G;ibdata2:1G:autoextend:max:2G
+		innodb_file_per_table = 1 //使innodb为每个表使用一个文件 表名.ibd
+		
+InnoDB双写缓存： InnoDB在对页面进行部分写入的时候使用了双缓冲，已防止数据损坏。双缓冲是表空间中一个特殊的保留区域，大小足够在一个连续块中容纳100个页面。
+		当InnoDB把页面从缓冲池中清写到磁盘上时，它会先把它们写入到双缓冲中，然后再写入到真正的地方，确保每次写入的原子性和可持续性。在某些情况下，双写缓存
+		并不是必需的，一些文件系统(比如ZFS)自身会做同样的事情，那么InnoDB就不用做重复的工作了。
+		innodb_dublewrite = 0 //禁用
+		
+另外的IO调优：sync_binlog = 0 | 1 
+
+MyISAM并发调优：concurrent_insert
+	0 MyISAM不允许并发插入，每一次插入都会把表锁住
+	1 默认值。只要表中没有空缺，MyISAM就允许并发插入
+	2 强制并发插入到表尾，即使表有空缺也不例外。如果没有线程从表中读取数据，MySQL就会把新数据插入到空缺中。使用了改配置，表的碎片会增多，所以就需要更经常对表进行优化
+	
+InnoDB并发调优：InnoDB的结构仍然基于有限的内存、单cpu和单磁盘系统。某些方面的性能在高并发条件下下降得很快，并且唯一的解决办法就是限制并发。
+	innodb_thread_concurrency 限制了一次有多少线程能进入内核。0表示不限制 并发 = cpu的数量 * 磁盘的数量 * 2 //实际中使用更小的值往往会更好
+	innodb_thread_sleep_delay 如果内核已经有了允许数量的线程，那么线程就不能再进入内核了。线程首先睡眠这个参数规定的微秒数（10000），然后再次进行尝试，如果还是不能进入，它就会进入一个等待线程的队列并把控制权交给操作系统。
+	innodb_commit_concurrency 决定了某一时刻有多少线程能进行提交。
+	
+网络配置：skip_name_resolve //打开该选项，mysql不会进行任何dns查找
+
+vmstat: vmstat 5
+iostat: iostat -dx 5	
+	并发 = (r/s + w/s) * (svctm/1000)
+fuser -uv 3306/tcp
 	
