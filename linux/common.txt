@@ -1,4 +1,4 @@
-group add mysql
+groupadd mysql
 useradd -g mysql -d /user/local/mysql -s /sbin/nologin -M mysql
 ps auxw --sort -vsz | head //虚拟内存使用最多的进程
 ps auxw --sort -rss | head //内存使用最多的进程
