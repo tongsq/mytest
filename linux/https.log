@@ -23,3 +23,7 @@ listen       443;
      ssl_protocols  SSLv2 SSLv3 TLSv1;
      ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
      ssl_prefer_server_ciphers   on;
+     
+listen 80;
+        server_name  www.abc.cc;
+        return 301 https://www.abc.cc$request_uri;
