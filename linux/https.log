@@ -1,0 +1,29 @@
+
+1、生成密钥key
+	openssl genrsa -des3 -out server.key 2048
+	//去除输入密码步骤
+	openssl rsa -in server.key -out server.key
+2、创建服务器证书的申请文件server.csr
+	openssl req -new -key server.key -out server.csr
+	Country Name:CN Common Name:host aa.cc
+3、创建CA证书
+	openssl req -new -x509 -key server.key -out ca.crt -days 3650
+4、创建服务器证书
+	openssl x509 -req -days 3650 -in server.csr -CA ca.crt -CAkey server.key -CAcreateserial -out server.crt
+	
+listen       443;
+     server_name  localhost;
+     ssl                  on;
+     ssl_certificate     /root/Lee/keys/server.crt;#配置证书位置
+     ssl_certificate_key  /root/Lee/keys/server.key;#配置秘钥位置
+     #ssl_client_certificate ca.crt;#双向认证
+     #ssl_verify_client on; #双向认证
+
+     ssl_session_timeout  5m;
+     ssl_protocols  SSLv2 SSLv3 TLSv1;
+     ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+     ssl_prefer_server_ciphers   on;
+     
+listen 80;
+        server_name  www.abc.cc;
+        return 301 https://www.abc.cc$request_uri;

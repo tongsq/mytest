@@ -136,4 +136,3 @@ vmstat: vmstat 5
 iostat: iostat -dx 5	
 	并发 = (r/s + w/s) * (svctm/1000)
 fuser -uv 3306/tcp
-	

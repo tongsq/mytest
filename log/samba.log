@@ -1,4 +1,4 @@
-amba开发环境搭建:
+samba开发环境搭建:
 1、关闭firewalld
 2、关闭selinux
 
