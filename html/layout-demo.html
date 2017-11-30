@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>hello</title>
+		<meta charset="utf-8"/>
+		<script type="text/javaScript">
+
+		</script>
+		<style type="text/css">
+			html,body{
+				height: 100%;
+			}
+			body,p,form,ul,li,a {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.body{
+				height:100%;
+				width:100%;
+				min-height: 100%;
+			}
+			.container{
+				background: #ccc;
+				width: 100%;
+				max-width:960px;
+				margin: 0 auto;
+				text-align: center;
+			}
+			/*
+			@media screen and (min-width: 960px){
+				.container{
+					width: 960px;
+				}
+			}
+			box-sizing: border-box;
+			@media screen and (max-width: 800px){
+				.container{
+					width:100%;
+					padding: 0 10px;
+				}
+			}*/
+			.float_left{
+				background: #bbb;
+				float:left;
+				width:500px;
+				height:50px;
+				display:inline;
+				//overflow:auto;
+			}
+			.clear{
+				//clear:left;
+			}
+			
+			.row{
+				display:-webkit-flex;
+				display:flex;
+			}
+			.w200{
+				width:200px;
+				background: 2e9872;
+			}
+			.-col-auto{
+				-webkit-flex:1;
+				flex:1;
+				background:#ccc;
+			}
+			.-col-initial{
+				-webkit-flex: initial;
+				flex: initial;
+				width: 200px;
+				min-width: 100px;
+			}
+			.-col-none{
+				-webkit-flex: none;
+				flex: none;
+				width:200px;
+			}
+			.-col-flex1{
+				-webkit-flex: 1;
+				flex: 1;
+			}
+			.-col-flex2{
+				-webkit-flex: 2;
+				flex: 2;
+			}
+			.vertical-container{
+				height: 300px;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-align-items: center;
+				-align-items: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				border: solid red 1px;
+			}
+		</style>
+	</head>
+	<body>
+	<div>
+		<div class="container">aaa</div>
+		<div style="background:#abc;width:50px;height:50px;margin:0 auto;margin-top:100px;"></div>
+		<div style="border:solid #eee 1px;overflow:auto;">
+		<div class="float_left"></div>
+			<div>ccccccccc</div>
+			<div class="clear">bbbbbbbbbbbbbbbb</div>
+		</div>
+		<div class="row">
+			<div class="w200">left 20</div>
+			<div class="-col-auto">col-auto</div>
+		</div>
+		<div class="row">
+			<div class="-col-initial">-col-initial</div>
+			<div class="-col-none">-col-none</div>
+			<div class="-col-flex1">-col-flex1</div>
+			<div class="-col-flex2">-col-flex2</div>
+		</div>
+		<div class="vertical-container">
+			<p>垂直水平居中</p>
+		</div>
+	</div>
+	</body>
+</html>
