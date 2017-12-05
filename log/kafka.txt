@@ -1,0 +1,32 @@
+安装：
+	wget http://mirrors.hust.edu.cn/apache/kafka/1.0.0/kafka_2.11-1.0.0.tgz
+	tar -zxf kafka_2.11-1.0.0.tgz && cd kafka_2.11-1.0.0
+
+启动zookeeper,默认端口2181
+sh bin/zookeeper-server-start.sh config/zookeeper.properties
+
+#启动broker,默认端口9092
+sh bin/kafka-server-start.sh config/server.properties
+
+#新增topic
+bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic my_topic_name --partitions 3 --replication-factor 2 --config x=y
+bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic my_topic_name --partitions 40
+
+#删除topic
+bin/kafka-topics.sh --zookeeper zk_host:port/chroot --delete --topic my_topic_name
+
+#查看消费者offset
+sh bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group consumer_php_1 
+sh bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group consumer_php_1 
+
+#列出所有消费者
+sh bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+消费者consumer group offsets过期问题：
+	问题：消费者长时间不去消费，保存在broker中的offsets信息会被删除，下次去消费会从头开始，导致重复读取队列中的数据
+	解决方案：log.cleaner.delete.retention.ms默认1天，修改参数使过期时间变长
+	
+	1、log.cleaner.delete.retention.ms：Kafka会定期清理过期consumer group的元数据信息，一旦发现dead group，会往__consumer_offsets对应分区写入一个特殊消息，这种消息被称为tombstone消息或delete消息。
+		Log cleaner在清理日志段时会根据log.cleaner.delete.retention.ms参数来计算一个时间点。位于该时间点之前的所有delete消息都会被清理掉。
+		
+	2、log.segment.delete.delay.ms参数控制了等待多少秒后再开始删除操作，默认是1分钟。
