@@ -1,0 +1,3 @@
+background-repeat: no-repeat;  
+background-attachment: fixed;  	//不随元素滚动
+background:inherit; 			//使用父级元素的背景
