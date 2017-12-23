@@ -18,6 +18,7 @@ function _M.run()
 	if ok > 100 then
 --		ngx.say("forbiden")
 		ngx.exit(ngx.HTTP_FORBIDDEN)
+		return
 	end
 	if ok == 1 then
 		red:expire(key, 5)
