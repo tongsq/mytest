@@ -32,3 +32,8 @@ sh bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 		Log cleaner在清理日志段时会根据log.cleaner.delete.retention.ms参数来计算一个时间点。位于该时间点之前的所有delete消息都会被清理掉。
 		
 	3、log.segment.delete.delay.ms参数控制了等待多少秒后再开始删除操作，默认是1分钟。	
+
+#Kafka topic leader = -1 or leader = none 节点挂掉导致队列重启后无法正常使用
+	broker添加如下配置:
+		auto.leader.rebalance.enable=true
+	重启后解决
