@@ -15,4 +15,8 @@ $serv->on('receive', function ($serv, $fd, $from_id, $data) {
 $serv->on('close', function ($serv, $fd) {
 	echo "Client: close.\n";
 });
+$serv->set(array(
+	'open_eof_split' => false,
+	'package_eof' => "c"
+));
 $serv->start();
