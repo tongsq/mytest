@@ -73,3 +73,5 @@ print(reduce(f3, [1,2,3,4,5]))
 def is_odd(*nums):
 	return list(filter(lambda x:x%2==0, nums))
 print(is_odd(1,2,3,4,5,6))
+from sys import path
+print(path)
