@@ -1,6 +1,6 @@
 <?php
 //$serv = new Swoole\Http\Server('0.0.0.0', 9500);
-$serv = new Swoole\Server('0.0.0.0', 9500);
+$serv = new Swoole\Http\Server('0.0.0.0', 9500);
 $rk = new RdKafka\Producer();
 $rk->setLogLevel(LOG_DEBUG);
 $rk->addBrokers("10.10.16.129:9092,10.10.16.129:9093");
@@ -15,7 +15,7 @@ $serv->on('shutdown', function($serv){
 	echo "swoole server shutdown!\n";
 });
 $serv->on('workerstart', function($serv, $worker_id) {
-	global $argv;
+	global $argv,$topic;
 	if($worker_id >= $serv->setting['worker_num']) {
         swoole_set_process_name("php {$argv[0]} task worker {$worker_id}");
     } else {
@@ -28,9 +28,11 @@ $serv->on('workerstart', function($serv, $worker_id) {
 	$serv->topic = $topic;
 	echo "init kafka client\n";
 });
+/*
 $serv->on('receive', function ($serv, $fd, $from_id, $data) {
     $serv->topic->produce(RD_KAFKA_PARTITION_UA, 0, "Message payload swoole 222");
-	$data = "success\n";
+	var_dump('receive');
+	/*$data = "success\n";
 	$length = strlen($data);
 	$date = date('D, d M Y H:i:s e');
 	$msg = <<<EOF
@@ -45,20 +47,19 @@ Connection: close
 EOF;
     $serv->send($fd, $msg);
     $serv->close($fd);
-});
-/*
+});*/
+
 $serv->on('request', function($request, $response){
-	global $a;
-	/*
-	$rk = new RdKafka\Producer();
+	/*$rk = new RdKafka\Producer();
 	$rk->setLogLevel(LOG_DEBUG);
 	$rk->addBrokers("10.10.16.129:9092,10.10.16.129:9093");
 	$topic = $rk->newTopic("test5");
-	$re = $topic->produce(RD_KAFKA_PARTITION_UA, 0, "Message payload swoole 222");
+	$re = $topic->produce(RD_KAFKA_PARTITION_UA, 0, "Message payload swoole 222");*/
+	global $topic;
+	$topic->produce(RD_KAFKA_PARTITION_UA, 0, "Message payload swoole 333");
 	$response->header('Content-Type', 'text/html; charset=utf-8');
-	$a++;
-	$response->end("success {$a}");
+	$response->end("success");
 });
-*/
+
 $serv->set(['worker_num'=>8]);
 $serv->start();
