@@ -10,3 +10,7 @@ laravel install:
 composer global require "laravel/installer"
 laravel new laraveldemo
 composer create-project --prefer-dist laravel/laravel laraveldemo "5.5.*"
+
+enable msg_get_queue()
+yum install php-process
+--enable-sysvmsg  --enable-sysvsem --enable-sysvshm
