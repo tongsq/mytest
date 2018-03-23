@@ -6,3 +6,5 @@ function demo($value1, $value2){
 }
 $arr3 = array_map('demo', $arr1, $arr2);
 var_dump($arr3);
+$arr4 = array_map('demo', $arr1);
+var_dump($arr4);
