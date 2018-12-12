@@ -20,3 +20,6 @@ sssserver:
   "method":"aes-256-cfb",
   "fast_open":false
 }
+
+故障重启
+xfs_repair -L /dev/mapper/centos-root
