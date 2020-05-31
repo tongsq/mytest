@@ -1,3 +1,6 @@
+创建用户：
+	create user `dba`@`%` identified by '123456';
+	grant all privileges on *.* to `dba`@`%`;
 前缀索引：使用字段的部分前缀做为索引，可以有效减少索引的长度
 	1)、创建索引
 		alter table testdb.user ADD KEY(username(5)) //使用username前5个字符作为索引

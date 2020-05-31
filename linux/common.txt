@@ -2,3 +2,24 @@ groupadd mysql
 useradd -g mysql -d /user/local/mysql -s /sbin/nologin -M mysql
 ps auxw --sort -vsz | head //虚拟内存使用最多的进程
 ps auxw --sort -rss | head //内存使用最多的进程
+
+查看进程正在执行的系统调用:
+strace -p
+
+sssserver:
+ yum install python-setuptools && easy_install pip
+ pip install shadowsocks
+ ssserver -c /etc/shadowsocks.json -d start
+ {
+  "server":159.89.235.36",
+  "server_port":8388,
+  "local_address":"127.0.0.1",
+  "local_port":"1080",
+  "password":"",
+  "timeout":300,
+  "method":"aes-256-cfb",
+  "fast_open":false
+}
+
+故障重启
+xfs_repair -L /dev/mapper/centos-root
