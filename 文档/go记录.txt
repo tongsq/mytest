@@ -1,0 +1,162 @@
+go env -w GOPROXY=https://goproxy.cn,direct   //设置代理
+export GOROOT=/usr/local/go
+export GOPATH=~/golib:~/goproject
+export GOBIN=~/gobin
+
+go run
+	-a 强制编译相关代码
+	-n 打印编译过程中所需运行的命令，但不真正执行他们
+	-p n  并行编译，n为并行的数量
+	-v 列出被编译的代码包名称
+	-word 显示编译时创建的临时工作目录的路径，并且不删除它
+	-x 打印编译过程中所需运行的命令
+
+go build //默认以文件夹命名
+go build -o demo  //指定生成的文件名
+go build min.go a.go //以第一个文件名
+
+go clean
+
+go install
+	整个文件夹安装为代码包 $GOBIN 目录(存在命令源码文件)
+	安装代码包（只包含库源码文件）
+go get
+	从远程代码仓库上下载并安装代码包 $GOPATH的第一个工作区目录中
+	-x
+	-d 只下载不安装
+	-fix 下载后先执行修正动作再安装
+	-u 更新本地代码包
+
+
+byte unit8  1个字节
+rune:
+	int32  4个字节
+	Unicode字符  字母A的Unicode代码点： "U+0041"  16进制表示65
+	1、'A'		直接使用Unicode字符 ，只能表示Unicode支持的字符
+	2、'\x41'  16进制数表示  "\x"加两个16进制数，只能表示ASCII编码支持的字符
+	3、'\101'  8进制数表示   "\"加3位8进制数，只能表示（0， 255）内的字符
+	4、'\u90DD' "\u"+4位16进制数，只能表示编码在(0, 65535)
+	5、'\U000090DD' "\U"+8位16进制数，可以表示所有Unicode字符
+
+fmt.Printf
+	%c 用于显示rune类型值代表的字符
+	%b 二进制数
+	%d 十进制数
+	%o 八进制数
+	%q 该值对应的单引号括起来的go语法字符字面值，必要时会采用安全的转义表示
+	%x 表示为十六进制，使用a-f  c000004540
+	%X 表示为十六进制，使用A-F  C000004540
+	%U 表示为Unicode格式：U+1234，等价于"U+%04X"
+	%E 用科学计数法表示
+	%f 用浮点数表示
+	%T 打印变量类型
+	%p 指针，十六进制显示 0xc000004540
+	%v 
+字符串：
+	不可变
+	原生表示： `\"`, 解释型表示："\\\""
+var numbers [5]int{1,2,3,4,5}  //越界会报runtime error
+Slice
+	var slice1 []int
+	slice1 = numbers[1,4,n] //切下不切上 n用来限制上界 {2,3,4}
+	引用类型，未赋值为nil
+	cap(mySlice)  //一个切片值的容量即为它的第一个元素值在其底层数组中的索引值与该数组长度的差值的绝对值
+	slice1 = slice1[:cap(slice1)] //其长度延展得与其容量相同 {2,3,4,5}
+	slice1 = append(slice1, 6, 7) //扩展 {2,3,4,5,6,7}
+	var slice2 = []int{0, 0, 0, 0, 0, 0, 0}
+	copy(slice2, slice1) //slice1复制到slice2 {2,3,4,5,6,7,0} 长度有关，容量无关
+
+Map 字典
+	mm := map[int]string{1: "a", 2: "b", 3: "c"}
+	b := mm[2] //b
+	mm[2] = b + "b" //b = "b" mm[2] = "bb"
+
+	mm[4] = ""
+	e, ok := mm[5] //key不存在 ok = false
+
+
+goroutine
+	go demo  //单线程内并发运行多个
+
+chan
+	ch1 := make(chan string, 1) //1表示通道的长度，缓冲通道
+	ch2 := make(chan string, 0) //非缓冲通道，发送后会阻塞直到被消费
+	ch1 <- "value1"   //send
+	vlaue,ok := <- ch1             //receive
+	close(ch1)
+	var sender chan<- string = ch2  //只能发送
+	var receiver <-chan string = ch2 //只能接收
+	1、不能重复关闭
+	2、通道值已满时发送将被阴塞，向关闭的通道发送会报错
+	3、已空时接收会阻塞
+	4、关闭了还可以接收，不能再推送
+	5、通道满了并且没有活跃的goroutine，推送会失败：fatal error: all goroutines are asleep - deadlock!
+	
+pointer
+	astr := new(string)  //创建指针
+	*astr = "abc"
+	aint := 1
+	ptr := &aint   //创建指针
+
+	var p1 *string  //nil
+
+defer 延迟语句:
+	1、在return之后调用
+	2、后进先出
+	3、使用 defer 只是延时调用函数，此时传递给函数里的变量，不应该受到后续程序的影响
+	4、recover捕获panic，只能在defer中使用
+	5、panic不会阻止defer运行
+	6、在子协程里触发 panic，只能触发自己协程内的 defer，而不能调用 main 协程里的 defer 函数
+
+type:
+	var i interface{} = 10
+    t1, ok := i.(int)
+    fmt.Printf("%d-%t\n", t1, ok)
+    func findType(i interface{}) {
+	    switch x := i.(type) {    i.(type) 只能在switch中使用
+	    case int:
+	        fmt.Println(x, "is int")
+	    case string:
+	        fmt.Println(x, "is string")
+	    case nil:
+	        fmt.Println(x, "is nil")
+	    default:
+	        fmt.Println(x, "not type matched")
+	    }
+	}
+
+new :
+	分配内存
+	设置零值
+	返回指针
+	num := new (int)
+	fmt.Println(*num)
+
+make :
+	只适用于：slice map chan 
+	返回类型的本身而不是指针
+
+动态作用域：shell 静态作用域：go
+
+go mod  包管理
+	go mod init github.com/tongsq/go-demo
+	go mod downlod 手动触发下载依赖包到本地cache（默认为$GOPATH/pkg/mod目录）
+	go mod graph  打印项目的模块依赖结构
+	go mod tidy 添加缺少的包，且删除无用的包
+	go mod verify  校验模块是否被篡改过
+	go mod why  查看为什么需要依赖
+	go mod vendor  导出项目所有依赖到vendor下
+	go mod edit  编辑go.mod文件，接 -fmt 参数格式化 go.mod 文件，接 -require=golang.org/x/text 添加依赖，接 -droprequire=golang.org/x/text 删除依赖
+	go list -m -json all 以 json 的方式打印依赖详情
+
+import _ "image/png"  匿名导入
+import . "fmt"  //使用方法时不需要带包名
+import mrand "math/rand"  //别名
+
+go test  运行整个项目的测试文件
+go test math_test.go 只运行某个测试文件
+go test -v 显示详细结果
+go test -v -run="TestAdd" 只测试某个函数,正则匹配
+go test -v -run="TestAdd" -c 生成test的二进制文件
+go test -v  -o math.test  执行测试文件
+go test -i 只测试安装/重新安装 依赖包，而不运行代码

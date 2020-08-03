@@ -1,0 +1,4 @@
+docker清理:
+	docker image prune -a -f  //删除悬空的镜像
+	docker container prune -f //删除悬空的容器
+	

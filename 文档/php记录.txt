@@ -82,6 +82,9 @@ php-fpm.conf
     catch_workers_output = yes
     #重定向运行过程中的stdout和stderr到主要的错误日志文件中. 如果没有设置, stdout 和 stderr 将会根据FastCGI的规则被重定向到 /dev/null . 默认值: 空.
 
+    emergency_restart_threshold = 0 #在指定的一段时间内，如果失效的PHP-FPM子进程数超过这个值，PHP-FPM主进程将优雅重启
+    emergency_restart_interval = 1m #设定emergency_restart_interval 设置采用的时间跨度。
+
 www.conf
 	######设置用户和用户组
     user = nginx
@@ -98,3 +101,8 @@ www.conf
     ######设置php的session目录（所属用户和用户组都是nginx）
     php_value[session.save_handler] = files
     php_value[session.save_path] = /var/lib/php/session
+
+
+服务器的QPS（每秒处理请求数） = 平均请求连接数*（1/响应时间）；
+
+并发量 = 有效时间*QPS；
