@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
 	"strconv"
 	"sync/atomic"
 )
@@ -43,11 +43,15 @@ func myFunc2(value1 string, value2 string) string {
 	return value1 + value2
 }
 
+func test1(value1 string, value2 string) (result string, err error) {
+	result = value1 + value2
+	return
+}
 
 func main() {
 	var generator EmployeeIdGenerator
 	generator = func(company string, department string, sn uint32) string {
-	    return company + "-" + appendSn(department + "-", sn)
+		return company + "-" + appendSn(department+"-", sn)
 	}
 	fmt.Println(generateId(generator, "RD"))
 
@@ -55,4 +59,7 @@ func main() {
 	myfunc = myFunc1
 	fmt.Println(myfunc("aa", "bb"))
 	fmt.Println(myFunc2("a", "b"))
+
+	res, err := test1("a", "b")
+	fmt.Println(res, err)
 }
