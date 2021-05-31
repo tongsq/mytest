@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -17,6 +19,20 @@ func Conn(network, address string) (net.Conn, error) {
 		return nil, err
 	}
 	return conn, nil
+}
+
+func GetRequest(args []string) []byte {
+	req := []string{
+		"*" + strconv.Itoa(len(args)),
+	}
+
+	for _, arg := range args {
+		req = append(req, "$"+strconv.Itoa(len(arg)))
+		req = append(req, arg)
+	}
+
+	str := strings.Join(req, "\r\n")
+	return []byte(str + "\r\n")
 }
 
 func main() {
