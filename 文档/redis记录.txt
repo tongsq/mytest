@@ -1,8 +1,13 @@
+完全基于内存
+数据结构简单
+单线程
+多路I/O复用模型，非阻塞io
+
 redis:
 	scan 0 MATCH *a* COUNT 10
 	monitor
 	keys a*
-	
+
 
 	rdb: 备份内存中的数据到二进制文件，恢复速度快
 		save   //阻塞,写rdb快照
@@ -28,7 +33,7 @@ redis:
 			1、对于同一份数据来说，AOF日志文件通常比RDB数据快照文件更大
 			2、AOF开启后，支持的写QPS会比RDB支持的写QPS低，因为AOF一般会配置成每秒fsync一次日志文件，当然，每秒一次fsync，性能也还是很高的
 			3、以前AOF发生过bug，就是通过AOF记录的日志，进行数据恢复的时候，没有恢复一模一样的数据出来
-	
+
 	事务：
 		watch key  //乐观锁，记录当前版本，提交时版本加1，版本小于等于服务器版本时事务提交失败
 		multi  //watch不能在multi之后执行
@@ -40,7 +45,7 @@ redis:
 			2) (integer) 1
 
 	基本类型：
-		string: 
+		string:
 			1、string类型是Redis最基本的数据类型，一个键最大能存储512MB
 			2、二进安全
 			3、sds
@@ -85,7 +90,24 @@ redis:
 
 	RESP:
 		For Simple Strings the first byte of the reply is "+" 回复For Errors the first byte of the reply is "-" 错误For Integers the first byte of the reply is ":" 整数For Bulk Strings the first byte of the reply is "$" 字符串For Arrays the first byte of the reply is "*" 数组
-	Twemproxy 
+	Twemproxy
 	redis-cluster集群: Redis-Cluster采用无中心结构，每个节点保存数据和整个集群状态,每个节点都和其他所有节点连接。
 
 	分布式锁： setnx key value
+
+    内存淘汰策略：maxmemory-policy
+        全局的键空间选择性移除
+            noeviction：当内存不足以容纳新写入数据时，新写入操作会报错。默认配置
+            allkeys-lru：当内存不足以容纳新写入数据时，在键空间中，移除最近最少使用的key。（这个是最常用的）
+            allkeys-random：当内存不足以容纳新写入数据时，在键空间中，随机移除某个key。
+        设置过期时间的键空间选择性移除
+            volatile-lru：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，移除最近最少使用的key。
+            volatile-random：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，随机移除某个key。
+            volatile-ttl：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，有更早过期时间的key优先移除。
+     FIFO 淘汰最早数据、LRU 剔除最近最少使用、和 LFU 剔除最近使用频率最低的
+ls
+    过期策略通常有以下三种：
+        定时过期：每个设置过期时间的key都需要创建一个定时器，到过期时间就会立即清除。该策略可以立即清除过期的数据，对内存很友好；但是会占用大量的CPU资源去处理过期的数据，从而影响缓存的响应时间和吞吐量。
+        惰性过期(redis)：只有当访问一个key时，才会判断该key是否已过期，过期则清除。该策略可以最大化地节省CPU资源，却对内存非常不友好。极端情况可能出现大量的过期key没有再次被访问，从而不会被清除，占用大量内存。
+        定期过期(redis)：每隔一定的时间，会扫描一定数量的数据库的expires字典中一定数量的key，并清除其中已过期的key。该策略是前两者的一个折中方案。通过调整定时扫描的时间间隔和每次扫描的限定耗时，可以在不同情况下使得CPU和内存资源达到最优的平衡效果。
+
