@@ -55,9 +55,9 @@ func main() {
 		}
 		basePath = defaultPath
 	}
-	fmt.Printf("%s : \n", basePath)
+	fmt.Printf("%s : start git drop\n", basePath)
 	err := gitDrop()
 	if err != nil {
-		fmt.Println("lss error: ", err)
+		fmt.Println("git drop error: ", err)
 	}
 }
